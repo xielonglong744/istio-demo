@@ -1,0 +1,37 @@
+version: '3.3'
+services:
+  envoy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+    - ./envoy.yaml:/etc/envoy/envoy.yaml
+    networks:
+      envoymesh:
+        aliases:
+        - envoy
+    depends_on:
+    - webserver1
+    - webserver2
+    expose:
+    - "80"
+  webserver1:
+    image: ikubernetes/mini-http-server:v0.3
+    networks:
+      envoymesh:
+        aliases:
+        - webservice1
+        - myservice
+    expose:
+    - "8081"
+  webserver2:
+    image: ikubernetes/mini-http-server:v0.3
+    networks:
+      envoymesh:
+        aliases:
+        - webservice2
+        - myservice
+    expose:
+    - "8081"
+networks:
+  envoymesh: {}

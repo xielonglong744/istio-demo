@@ -1,0 +1,39 @@
+admin:
+  access_log_path: /tmp/admin_envoy_access.log
+  address:
+    socket_address: {address: 0.0.0.0,port_value: 9901}
+static_resources:
+  listeners:
+  - name: backend_listener
+    address:
+      socket_address: { address: 0.0.0.0,port_value: 80}
+    filter_chains:
+    - filter:
+      - name: envoy.http_connection_manager
+        config:
+          stat_prefix: http_ingress
+          codec_type: AUTO
+          route_config:
+            name: test_config
+            virtual_hosts:
+            - name: sidcar
+              domains: ["*"]
+              routes:
+              - match: {prefix: "/service"}
+                route: {cluster: local_service}
+        http_filters:
+        - name: envoy.router
+  clusters:
+  - name: local_service
+    type: STRICT_DNS
+    connect_timeout: 0.25s
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: local_service
+      endpoints:
+      - lb_enpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: 127.0.0.1
+                port_value: 8080

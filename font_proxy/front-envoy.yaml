@@ -1,0 +1,50 @@
+admin:
+  access_log_path: /tmp/admin_envoy_access.log
+  address:
+    socket_address: { address: 0.0.0.0,port_value: 9901}
+static_resources:
+  listeners:
+  - name: front-proxy
+    address:
+      socket_address: { address: 0.0.0.0,port_value: 80}
+    filter_chains:
+    - filters:
+      - name: envoy.http_connection_manager
+        config:
+          stat_prefix: ingress_http
+          codec_type: AUTO
+          route_config:
+            name: test_config
+            virtual_hosts:
+            - name: web_server
+              domains: ["*"]
+              routes:
+              - match: {prefix: "/service/1"}
+                route: {cluster: service1}
+              - match: {prefix: "/service/2"}
+                route: {cluster: service2}
+        http_filters:
+        - name: envoy.router
+  clusters:
+  - name: service1
+    type: STRICT_DNS
+    connect_timeout: 0.25s
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: service1
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address: {address: service1,port_value: 80}
+  - name: service2
+    type: STRICT_DNS
+    connect_timeout: 0.25s
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: service2
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address: {address: service2,port_value: 80}

@@ -1,0 +1,9 @@
+FROM envoyproxy/envoy-alpine:v1.11.1
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+RUN apk update && apk add python3 bash curl
+RUN pip3 install -q Flask==0.11.1 requests==2.18.4 -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN mkdir /code
+ADD ./service.py  /code
+ADD ./start_service.sh /usr/local/bin/start_service.sh
+RUN chmod +x /usr/local/bin/start_service.sh
+ENTRYPOINT /usr/local/bin/start_service.sh
