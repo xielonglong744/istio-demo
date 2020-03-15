@@ -1,8 +1,8 @@
 {
-  "version": "2.0",
+  "version": "3.0",
   "endpoints": [
     {
-      "cluster_name": "xds_cluster",
+      "cluster_name": "webcluster",
       "endpoints": [
         {
           "lb_endpoints": [
@@ -10,7 +10,7 @@
               "endpoint": {
                 "address": {
                   "socket_address": {
-                    "address": "172.18.0.4",
+                    "address": "172.20.0.4",
                     "port_value": 8081
                   }
                 }

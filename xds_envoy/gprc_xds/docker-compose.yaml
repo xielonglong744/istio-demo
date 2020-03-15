@@ -1,4 +1,5 @@
 version: '3.3'
+
 services:
   envoy:
     build:
@@ -14,6 +15,8 @@ services:
     ports:
     - "80:80"
     - "9901:9901"
+    depends_on:
+    - "xdsserver"
   webserver1:
     image: ikubernetes/mini-http-server:v0.3
     networks:
@@ -34,16 +37,16 @@ services:
     - "8081"
     depends_on:
     - "envoy"
-  edsserver:
-    image: ikubernetes/eds-rest-server
+  xdsserver:
+    image: ikubernetes/sxds
     networks:
       envoymesh:
         aliases:
-        - edsserver
-        - eds
+        - xdsservice
+        - xdsserver
     expose:
-    - "8080"
-    ports:
-    - "8080:8080"
+    - "8081"
+    - "8082"
+
 networks:
   envoymesh: {}

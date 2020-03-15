@@ -14,6 +14,9 @@ services:
     ports:
     - "80:80"
     - "9901:9901"
+    depends_on:
+    - "xdsserver"
+
   webserver1:
     image: ikubernetes/mini-http-server:v0.3
     networks:
@@ -24,6 +27,7 @@ services:
     - "8081"
     depends_on:
     - "envoy"
+
   webserver2:
     image: ikubernetes/mini-http-server:v0.3
     networks:
@@ -34,16 +38,18 @@ services:
     - "8081"
     depends_on:
     - "envoy"
-  edsserver:
-    image: ikubernetes/eds-rest-server
+
+  xdsserver:
+    image: ikubernetes/sxds
     networks:
       envoymesh:
         aliases:
-        - edsserver
-        - eds
+        - xdsserver
+        - xds-service
     expose:
-    - "8080"
-    ports:
-    - "8080:8080"
+    - "8081"
+    - "8082"
+
 networks:
   envoymesh: {}
+

@@ -28,8 +28,8 @@ static_resources:
               routes:
               - match: {prefix: "/"}
                 route: {cluster: webcluster1}
-        http_filters:
-        - name: envoy.router
+          http_filters:
+          - name: envoy.router
   clusters:
   - name: webcluster1
     type: EDS
@@ -39,8 +39,8 @@ static_resources:
       service_name: myservice
       eds_config:
         api_config_source:
-          api_type: TEST
-          cluster_name: [edscluster]
+          api_type: REST
+          cluster_names: [edscluster]
           refresh_delay: 5s
   - name: edscluster
     connect_timeout: 0.25s

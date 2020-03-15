@@ -1,0 +1,23 @@
+{
+  "hosts": [
+    {
+      "ip_address": "192.168.32.5",
+      "port": 8081,
+      "tags": {
+        "az": "cn-north1-a",
+        "canary": false,
+        "load_balancing_weight": 50
+      }
+    },
+    {
+      "ip_address": "192.168.32.5",
+      "port": 8081,
+      "tags": {
+        "az": "cn-north1-a",
+        "canary": false,
+        "load_balancing_weight": 50
+      }
+    }
+  ]
+}
+
