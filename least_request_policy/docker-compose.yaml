@@ -1,0 +1,52 @@
+version: '3.3'
+services:
+  envoy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      envoymesh:
+        aliases:
+        - envoy
+    expose:
+    - "80"
+    - "9901"
+  service_blue:
+    image: ikubernetes/servicemesh-app:latest
+    networks:
+      envoymesh:
+        aliases:
+          - service_blue
+          - colored
+    environment:
+      - SERVICE_NAME=blue
+    expose:
+      - "80"
+
+  service_green:
+    image: ikubernetes/servicemesh-app:latest
+    networks:
+      envoymesh:
+        aliases:
+          - service_green
+          - colored
+    environment:
+      - SERVICE_NAME=green
+    expose:
+      - "80"
+
+  service_red:
+    image: ikubernetes/servicemesh-app:latest
+    networks:
+      envoymesh:
+        aliases:
+          - service_red
+          - colored
+    environment:
+      - SERVICE_NAME=red
+    expose:
+      - "80"
+
+networks:
+  envoymesh: {}
+
