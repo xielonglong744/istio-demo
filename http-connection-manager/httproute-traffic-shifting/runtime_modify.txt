@@ -1,0 +1,2 @@
+
+curl -XPOST ip:9901/runtime_modify?routing.tarffic_shift.myapp=0

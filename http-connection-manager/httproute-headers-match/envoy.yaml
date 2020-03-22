@@ -1,0 +1,89 @@
+admin:
+  access_log_path: /dev/null
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 9901
+static_resources:
+  listeners:
+  - name: http_listener
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 80
+    filter_chains:
+    - filters:
+      - name: envoy.http_connection_manager
+        config:
+          stat_prefix: ingress_http
+          codec_type: AUTO
+          route_config:
+            name: test_route
+            virtual_hosts:
+            - name: webclusters1
+              domains: ["*"]
+              routes:
+              - match: 
+                  prefix: "/"
+                  headers:
+                  - name: x-canary
+                    exact_match: "true"
+                route:
+                  cluster: ver-1.7-pre
+              - match:
+                  prefix: "/"
+                  query_parameters:
+                  - name: username
+                    string_match:
+                      prefix: "vip_"
+                route:
+                  cluster: ver-1.6
+              - match:
+                  prefix: "/"
+                route:
+                  cluster: ver-1.5
+          http_filters:     
+          - name: envoy.router
+  clusters:
+  - name: ver-1.7-pre
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    connect_timeout: 0.25s
+    http2_protocol_options: {}
+    load_assignment:
+      cluster_name: ver-1.7-pre
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: ver-1.7-pre
+                port_value: 80  
+  - name: ver-1.6
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    connect_timeout: 0.25s
+    http2_protocol_options: {}
+    load_assignment:
+      cluster_name: ver-1.6
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: ver-1.6
+                port_value: 80  
+  - name: ver-1.5
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    connect_timeout: 0.25s
+    http2_protocol_options: {}
+    load_assignment:
+      cluster_name: ver-1.5
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: ver-1.5
+                port_value: 80  

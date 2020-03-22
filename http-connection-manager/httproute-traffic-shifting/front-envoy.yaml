@@ -1,0 +1,67 @@
+admin:
+  access_log_path: /dev/null
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 9901
+static_resources:
+  listeners:
+  - name: http_listener
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 80
+    filter_chains:
+    - filters:
+      - name: envoy.http_connection_manager
+        config:
+          stat_prefix: ingress_http
+          codec_type: AUTO
+          route_config:
+            name: test_route
+            virtual_hosts:
+            - name: webcluster
+              domains: ["*"]
+              routes:
+              - match: 
+                  prefix: "/"
+                  runtime_fraction:
+                     default_value:
+                       numerator: 100
+                       denominator: HUNDRED
+                     runtime_key: routing.traffic_shift.myapp
+                route:
+                  cluster: myapp-v1.5
+              - match:
+                  prefix: "/"
+                route:
+                  cluster: myapp-v1.6
+          http_filters:
+          - name: envoy.router
+  clusters:
+  - name: myapp-v1.5
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    connect_timeout: 0.25s
+    load_assignment:
+      cluster_name: myapp-v1.5
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: myapp-v1.5
+                port_value: 80
+  - name: myapp-v1.6
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    connect_timeout: 0.25s
+    load_assignment:
+      cluster_name: myapp-v1.5
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: myapp-v1.6
+                port_value: 80
